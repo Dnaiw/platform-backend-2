@@ -1,6 +1,6 @@
 export class CreateCardDto {
-  id: number;
-  guessedWord: string;
+  id: string;
+  question: string;
   forbiddenWords: string[];
-  deckId: number;
+  deckId: string;
 }
