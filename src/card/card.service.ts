@@ -27,7 +27,7 @@ export class CardService {
       throw `Card with id ${id} doesn't exist`;
     }
 
-    return doc;
+    return doc.data();
   }
 
   update(id: string, updateCardDto: UpdateCardDto) {
