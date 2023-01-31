@@ -1,15 +1,18 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { CreateDeckDto } from './dto/create-deck.dto';
 import { UpdateDeckDto } from './dto/update-deck.dto';
 import { firestore } from 'firebase-admin';
 import { CardService } from 'src/card/card.service';
+import { ErrorHandlerService } from 'src/util/error-handler/error-handler.service';
 
 @Injectable()
 export class DeckService {
   private decksCollection = firestore().collection('decks');
 
-  @Inject(CardService)
-  private readonly cardService: CardService;
+  constructor(
+    private errorHandler: ErrorHandlerService,
+    private cardService: CardService,
+  ) {}
 
   create(createDeckDto: CreateDeckDto) {
     const deck: Omit<CreateDeckDto, 'id'> = {
@@ -25,10 +28,12 @@ export class DeckService {
   }
 
   async findOne(id: string) {
-    const cardRef = this.decksCollection.doc(id);
-    const doc = await cardRef.get();
+    const deckRef = this.decksCollection.doc(id);
+    const doc = await deckRef.get();
     if (!doc.exists) {
-      throw `Card with id ${id} doesn't exist`;
+      throw this.errorHandler.createExceptionWithMessage(
+        `Deck with id ${id} doesn't exist`,
+      );
     }
 
     return doc.data();
@@ -39,7 +44,14 @@ export class DeckService {
   }
 
   async remove(id: string) {
-    this.cardService.deleteAllCardsFromDeck(id);
+    try {
+      await this.cardService.deleteAllCardsFromDeck(id);
+    } catch (e) {
+      throw this.errorHandler.createExceptionWithMessage(
+        'Error while deleting cards from the deck',
+        e,
+      );
+    }
     return this.decksCollection.doc(id).delete();
   }
 }
