@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  Query,
 } from '@nestjs/common';
 import { CardService } from './card.service';
 import { CreateCardDto } from './dto/create-card.dto';
@@ -23,6 +24,11 @@ export class CardController {
   @Get()
   findAll() {
     return this.cardService.findAll();
+  }
+
+  @Get('/getCardsFromDeck')
+  getCardsFromDeck(@Query('deckId') deckId: string) {
+    return this.cardService.getCardsFromDeck(deckId);
   }
 
   @Get(':id')

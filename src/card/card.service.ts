@@ -16,8 +16,14 @@ export class CardService {
     return this.cardsCollection.doc(createCardDto.id).set(card);
   }
 
-  findAll() {
-    return `This action returns all card`;
+  async findAll() {
+    const snapshot = await this.cardsCollection.get();
+    return snapshot.docs.map((doc) => doc.data());
+  }
+
+  async getCardsFromDeck(id: string) {
+    const snapshot = await this.cardsCollection.where('deckId', '==', id).get();
+    return snapshot.docs.map((doc) => doc.data());
   }
 
   async findOne(id: string) {
@@ -36,5 +42,15 @@ export class CardService {
 
   remove(id: string) {
     return this.cardsCollection.doc(id).delete();
+  }
+
+  async deleteAllCardsFromDeck(id: string) {
+    const snapshot = await this.cardsCollection.where('deckId', '==', id).get();
+    const documents = snapshot.docs;
+    let i: number;
+    for (i = 0; i < documents.length; i++) {
+      this.cardsCollection.doc(documents[i].id).delete();
+    }
+    return;
   }
 }
