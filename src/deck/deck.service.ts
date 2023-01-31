@@ -14,12 +14,13 @@ export class DeckService {
     private cardService: CardService,
   ) {}
 
-  create(createDeckDto: CreateDeckDto) {
+  async create(createDeckDto: CreateDeckDto): Promise<CreateDeckDto> {
     const deck: Omit<CreateDeckDto, 'id'> = {
       name: createDeckDto.name,
       gameId: createDeckDto.gameId,
     };
-    return this.decksCollection.doc(createDeckDto.id).set(deck);
+    await this.decksCollection.doc(createDeckDto.id).set(deck);
+    return { ...createDeckDto };
   }
 
   async findAll() {
@@ -39,8 +40,12 @@ export class DeckService {
     return doc.data();
   }
 
-  update(id: string, updateDeckDto: UpdateDeckDto) {
-    return this.decksCollection.doc(id).set(updateDeckDto);
+  async update(
+    id: string,
+    updateDeckDto: UpdateDeckDto,
+  ): Promise<UpdateDeckDto> {
+    await this.decksCollection.doc(id).set(updateDeckDto);
+    return { id, ...updateDeckDto };
   }
 
   async remove(id: string) {
