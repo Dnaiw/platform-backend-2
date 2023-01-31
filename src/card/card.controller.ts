@@ -26,7 +26,7 @@ export class CardController {
     return this.cardService.findAll();
   }
 
-  @Get('/getCardsFromDeck')
+  @Get()
   getCardsFromDeck(@Query('deckId') deckId: string) {
     return this.cardService.getCardsFromDeck(deckId);
   }
